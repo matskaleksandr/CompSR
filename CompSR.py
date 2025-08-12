@@ -1,6 +1,25 @@
 import requests
 import clr
 import os
+from PySide6.QtWidgets import QApplication, QMainWindow, QListWidget
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
+
+
+if __name__ == "__main__":
+    app = QApplication([])
+
+    loader = QUiLoader()
+    ui_file = QFile("main.ui")
+    ui_file.open(QFile.ReadOnly)
+    window = loader.load(ui_file)
+    ui_file.close()
+
+    window.show()
+    app.exec()
+
+
+
 dll_path = os.path.join(os.path.dirname(__file__), "GDELib.dll")
 print("Ищу DLL по пути:", dll_path, "— существует?", os.path.exists(dll_path))
 clr.AddReference(dll_path)
