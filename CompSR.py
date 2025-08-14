@@ -5,18 +5,17 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QListWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
+# if __name__ == "__main__":
+#     app = QApplication([])
 
-if __name__ == "__main__":
-    app = QApplication([])
+#     loader = QUiLoader()
+#     ui_file = QFile("main.ui")
+#     ui_file.open(QFile.ReadOnly)
+#     window = loader.load(ui_file)
+#     ui_file.close()
 
-    loader = QUiLoader()
-    ui_file = QFile("main.ui")
-    ui_file.open(QFile.ReadOnly)
-    window = loader.load(ui_file)
-    ui_file.close()
-
-    window.show()
-    app.exec()
+#     window.show()
+#     app.exec()
 
 
 
@@ -40,30 +39,34 @@ parts = [
     "Корпус"
 ]
 
-def get_price_from_product_url(product_url):
-    # Берём код товара из конца ссылки
+def get_product_info(product_url):
     product_code = product_url.rstrip("/").split("/")[-1]
     api_url = f"https://catalog.onliner.by/sdapi/catalog.api/products/{product_code}"
     
     response = requests.get(api_url)
     response.raise_for_status()
     data = response.json()
-    return float(data["prices"]["price_min"]["amount"])
+    
+    # Название товара
+    name = data.get("full_name") or data.get("name") or "Без названия"
+    # Минимальная цена
+    price = float(data["prices"]["price_min"]["amount"])
+    return name, price
 
 total_price = 0
 
 for part in parts:
     link = input(f"{part}: ").strip()
-    DE.CreateCell("string",link)
+    DE.CreateCell("string", link)
     if not link:
         print(f"{part}: пропущено")
         continue
     try:
-        price = get_price_from_product_url(link)
+        name, price = get_product_info(link)
         total_price += price
-        print(f"{part}: {price:.2f} BYN")
+        print(f"{part}: {name} — {price:.2f} BYN")
     except Exception as e:
-        print(f"{part}: не удалось получить цену — {e}")
+        print(f"{part}: не удалось получить данные — {e}")
 
 print(f"\nОбщая сумма: {total_price:.2f} BYN")
 DE.Save()
