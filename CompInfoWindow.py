@@ -5,6 +5,7 @@ import textwrap
 from functools import partial
 import re
 from bs4 import BeautifulSoup
+from SpecsWindow import SpecsWindow
 
 class CompInfo(QMainWindow):
     def __init__(self):
@@ -31,6 +32,24 @@ class CompInfo(QMainWindow):
 
         for button, input_edit, output_edit, label in self.mapping:
             button.clicked.connect(partial(self.update_info, input_edit, output_edit, label))
+
+        self.mapping2 = [
+            (self.ui.pushButton_15,   self.ui.textEdit,    self.ui.label_13),
+            (self.ui.pushButton_16,   self.ui.textEdit_2,  self.ui.label_14),
+            (self.ui.pushButton_17,   self.ui.textEdit_3,  self.ui.label_15),
+            (self.ui.pushButton_18,   self.ui.textEdit_4,  self.ui.label_16),
+            (self.ui.pushButton_19,   self.ui.textEdit_5,  self.ui.label_17),
+            (self.ui.pushButton_20,   self.ui.textEdit_6,  self.ui.label_18),
+            (self.ui.pushButton_21,   self.ui.textEdit_7,  self.ui.label_19),
+            (self.ui.pushButton_22,   self.ui.textEdit_8,  self.ui.label_20),
+            (self.ui.pushButton_23,   self.ui.textEdit_9,  self.ui.label_21),
+            (self.ui.pushButton_24,   self.ui.textEdit_10, self.ui.label_22),
+            (self.ui.pushButton_25,   self.ui.textEdit_11, self.ui.label_23),
+            (self.ui.pushButton_26,   self.ui.textEdit_12, self.ui.label_24),
+        ]
+
+        for button, input_edit, label in self.mapping2:
+            button.clicked.connect(partial(self.specs_info, input_edit, label))
 
     def get_specs_from_html(self, product_url):
         headers = {
@@ -106,7 +125,18 @@ class CompInfo(QMainWindow):
         """)
         output_edit.setHtml(html_template)
 
+        # Покажем окно с характеристиками
+        # specs = self.get_specs_from_html(input_edit.toPlainText())
+        # specs_window = SpecsWindow(specs, self, label.text())
+        # specs_window.exec()
+
         self.recalculate_total_from_fields()
+
+    def specs_info(self, input_edit, label):
+
+        specs = self.get_specs_from_html(input_edit.toPlainText())
+        specs_window = SpecsWindow(specs, self, label.text())
+        specs_window.exec()
 
     def _extract_price(self, text: str) -> float:
         m = re.search(r'(\d[\d\s]*[.,]?\d*)', text)
